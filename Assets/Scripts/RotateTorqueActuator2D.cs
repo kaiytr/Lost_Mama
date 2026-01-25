@@ -4,17 +4,31 @@
 public class RotateTorqueActuator2D : MonoBehaviour, IActuator
 {
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private float torque = 800f;
-    [SerializeField] private float maxAngVel = 360f;
 
-    [Header("Idle Brake")]
-    [Tooltip("입력 없을 때 각속도를 0으로 얼마나 빨리 끌어내릴지(클수록 빨리 멈춤)")]
-    [SerializeField] private float brakeStrength = 12f; // 8~25 추천
+    [Header("Speed (press longer -> faster)")]
+    [SerializeField] private float baseMaxAngVel = 80f;     // 시작 속도 (원한대로 80)
+    [SerializeField] private float maxMaxAngVel = 420f;     // 오래 누르면 도달할 최대속도
+    [SerializeField] private float secondsToMax = 5f;       // ✅ 이 시간이 길수록 가속이 '천천히' 체감됨
 
-    [Tooltip("이 이하 각속도면 완전히 멈춘 걸로 처리")]
-    [SerializeField] private float stopThreshold = 2f;  // deg/sec
+    [Header("Torque (also ramps up so it actually accelerates)")]
+    [SerializeField] private float baseTorque = 300f;       // 시작 토크
+    [SerializeField] private float maxTorque = 2000f;       // 오래 누르면 토크(하중 버티려면 크게)
+
+    [Header("Idle Brake (smooth decel)")]
+    [SerializeField] private float brakeStrength = 1.2f;    // 낮을수록 천천히 감속
+    [SerializeField] private float stopThreshold = 0.0f;    // 0 추천(뚝 멈춤 제거)
+
+    [Header("Input")]
+    [SerializeField] private float inputDeadzone = 0.05f;
+
+    [Header("Ramp behavior when released")]
+    [SerializeField] private float rampDownPerSec = 0.6f;   // 손 떼면 누적가속이 얼마나 빨리 내려갈지
+    [SerializeField] private bool resetRampInstantlyOnRelease = false;
 
     private float inputX;
+
+    // 누르고 있는 시간(초)
+    private float rampTime;
 
     private void Awake()
     {
@@ -26,22 +40,43 @@ public class RotateTorqueActuator2D : MonoBehaviour, IActuator
 
     private void FixedUpdate()
     {
-        if (Mathf.Abs(inputX) > 0.001f)
+        float dt = Time.fixedDeltaTime;
+        bool driving = Mathf.Abs(inputX) > inputDeadzone;
+
+        if (driving)
         {
-            // 조작 중: 기존 손맛 유지
-            rb.AddTorque(-inputX * torque, ForceMode2D.Force); // dt 곱 빼는 게 보통 더 안정적
-            rb.angularVelocity = Mathf.Clamp(rb.angularVelocity, -maxAngVel, maxAngVel);
+            // ✅ 누르고 있는 시간 누적
+            rampTime += dt;
         }
         else
         {
-            // ✅ 입력 없을 때: 관성 감속(브레이크)
-            float av = rb.angularVelocity;
+            // ✅ 손 떼면 누적 가속 내려가기
+            if (resetRampInstantlyOnRelease)
+                rampTime = 0f;
+            else
+                rampTime = Mathf.Max(0f, rampTime - rampDownPerSec * dt);
+        }
 
-            // 지수 감쇠(프레임/고정델타에 독립적으로 자연스럽게 줄어듦)
-            float t = 1f - Mathf.Exp(-brakeStrength * Time.fixedDeltaTime);
+        // 0~1 가속 게이지
+        float ramp01 = (secondsToMax <= 0.001f) ? 1f : Mathf.Clamp01(rampTime / secondsToMax);
+
+        // ramp에 따라 최고속도/토크 함께 증가 (체감 + 실제 가속 보장)
+        float currentMaxAngVel = Mathf.Lerp(baseMaxAngVel, maxMaxAngVel, ramp01);
+        float currentTorque = Mathf.Lerp(baseTorque, maxTorque, ramp01);
+
+        if (driving)
+        {
+            rb.AddTorque(-inputX * currentTorque, ForceMode2D.Force);
+            rb.angularVelocity = Mathf.Clamp(rb.angularVelocity, -currentMaxAngVel, currentMaxAngVel);
+        }
+        else
+        {
+            // ✅ 부드러운 감속
+            float av = rb.angularVelocity;
+            float t = 1f - Mathf.Exp(-brakeStrength * dt);
             av = Mathf.Lerp(av, 0f, t);
 
-            if (Mathf.Abs(av) < stopThreshold) av = 0f;
+            if (stopThreshold > 0f && Mathf.Abs(av) < stopThreshold) av = 0f;
             rb.angularVelocity = av;
         }
     }

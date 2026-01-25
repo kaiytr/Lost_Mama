@@ -432,8 +432,8 @@ GameObject:
   - component: {fileID: 1377000297}
   - component: {fileID: 1377000296}
   - component: {fileID: 1377000295}
+  - component: {fileID: 1377000298}
   - component: {fileID: 1377000294}
-  - component: {fileID: 1377000293}
   m_Layer: 6
   m_Name: RotatingArm
   m_TagString: Untagged
@@ -456,23 +456,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1020416006}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1377000293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1377000291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 446df1893b5f9d3448ddc04aca839c69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RotateTorqueActuator2D
-  rb: {fileID: 0}
-  torque: 800
-  maxAngVel: 120
-  brakeStrength: 12
-  stopThreshold: 2
 --- !u!233 &1377000294
 HingeJoint2D:
   m_ObjectHideFlags: 0
@@ -631,6 +614,29 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1377000298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1377000291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 446df1893b5f9d3448ddc04aca839c69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RotateTorqueActuator2D
+  rb: {fileID: 0}
+  baseMaxAngVel: 80
+  maxMaxAngVel: 420
+  secondsToMax: 5
+  baseTorque: 300
+  maxTorque: 2000
+  brakeStrength: 1.2
+  stopThreshold: 0
+  inputDeadzone: 0.05
+  rampDownPerSec: 0.6
+  resetRampInstantlyOnRelease: 0
 --- !u!1 &1619182513
 GameObject:
   m_ObjectHideFlags: 0
@@ -857,8 +863,8 @@ GameObject:
   - component: {fileID: 1874854202}
   - component: {fileID: 1874854201}
   - component: {fileID: 1874854200}
+  - component: {fileID: 1874854203}
   - component: {fileID: 1874854199}
-  - component: {fileID: 1874854198}
   m_Layer: 6
   m_Name: RotatingArm
   m_TagString: Untagged
@@ -881,23 +887,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 772024030}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1874854198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1874854196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 446df1893b5f9d3448ddc04aca839c69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RotateTorqueActuator2D
-  rb: {fileID: 0}
-  torque: 800
-  maxAngVel: 120
-  brakeStrength: 12
-  stopThreshold: 2
 --- !u!233 &1874854199
 HingeJoint2D:
   m_ObjectHideFlags: 0
@@ -1056,6 +1045,29 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1874854203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1874854196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 446df1893b5f9d3448ddc04aca839c69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RotateTorqueActuator2D
+  rb: {fileID: 0}
+  baseMaxAngVel: 80
+  maxMaxAngVel: 420
+  secondsToMax: 5
+  baseTorque: 300
+  maxTorque: 2000
+  brakeStrength: 1.2
+  stopThreshold: 0
+  inputDeadzone: 0.05
+  rampDownPerSec: 0.6
+  resetRampInstantlyOnRelease: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
