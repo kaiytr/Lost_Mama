@@ -470,7 +470,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RotateTorqueActuator2D
   rb: {fileID: 0}
   torque: 800
-  maxAngVel: 360
+  maxAngVel: 120
+  brakeStrength: 12
+  stopThreshold: 2
 --- !u!233 &1377000294
 HingeJoint2D:
   m_ObjectHideFlags: 0
@@ -893,7 +895,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RotateTorqueActuator2D
   rb: {fileID: 0}
   torque: 800
-  maxAngVel: 360
+  maxAngVel: 120
+  brakeStrength: 12
+  stopThreshold: 2
 --- !u!233 &1874854199
 HingeJoint2D:
   m_ObjectHideFlags: 0
