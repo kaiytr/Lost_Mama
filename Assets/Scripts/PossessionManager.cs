@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PossessionManager : MonoBehaviour
@@ -15,12 +15,11 @@ public class PossessionManager : MonoBehaviour
 
     private void Update()
     {
-        // ÀÔ·Â ÀåÄ¡°¡ ¾øÀ¸¸é(ºôµå/È¯°æ) ¹æ¾î
         var kb = Keyboard.current;
         var mouse = Mouse.current;
         if (kb == null || mouse == null) return;
 
-        // 1) Å¬¸¯À¸·Î ´ë»ó ¼±ÅÃ
+        // í´ë¦­ìœ¼ë¡œ ëŒ€ìƒ ì„ íƒ
         if (mouse.leftButton.wasPressedThisFrame)
         {
             Vector2 screenPos = mouse.position.ReadValue();
@@ -30,17 +29,27 @@ public class PossessionManager : MonoBehaviour
             if (hit.collider != null)
             {
                 var p = hit.collider.GetComponentInParent<PossessableObject>();
-                if (p != null) current = p;
+                if (p != null && p != current)
+                {
+                    if (current != null) current.SetPossessed(false);
+                    current = p;
+                    current.SetPossessed(true);
+                }
             }
         }
 
-        // 2) A/D ÀÔ·Â Ãà ¸¸µé±â (-1 ~ +1)
+        // A/D ì…ë ¥
         float x = 0f;
         if (kb.aKey.isPressed) x -= 1f;
         if (kb.dKey.isPressed) x += 1f;
 
-        // 3) ÇöÀç ºùÀÇ ´ë»ó¿¡¸¸ ÀÔ·Â Àü´Ş
+        // Space ì°¨ì§€ ì…ë ¥
+        bool charging = kb.spaceKey.isPressed;
+
         if (current != null)
+        {
             current.Handle(x);
+            current.HandleCharging(charging);
+        }
     }
 }
