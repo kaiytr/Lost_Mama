@@ -627,16 +627,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RotateTorqueActuator2D
   rb: {fileID: 0}
-  baseMaxAngVel: 80
-  maxMaxAngVel: 420
-  secondsToMax: 5
-  baseTorque: 300
-  maxTorque: 2000
-  brakeStrength: 1.2
-  stopThreshold: 0
+  baseMaxAngVel: 22
+  maxMaxAngVel: 140
+  secondsToMax: 6
+  baseTorque: 55
+  maxTorque: 700
+  brakeStrength: 8
+  stopThreshold: 0.15
   inputDeadzone: 0.05
-  rampDownPerSec: 0.6
-  resetRampInstantlyOnRelease: 0
+  angularDragWhenIdle: 3
+  angularDragWhenDriving: 0.2
+  resetRampOnDirectionChange: 1
 --- !u!1 &1619182513
 GameObject:
   m_ObjectHideFlags: 0
@@ -1058,16 +1059,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RotateTorqueActuator2D
   rb: {fileID: 0}
-  baseMaxAngVel: 80
-  maxMaxAngVel: 420
-  secondsToMax: 5
-  baseTorque: 300
-  maxTorque: 2000
-  brakeStrength: 1.2
-  stopThreshold: 0
+  baseMaxAngVel: 22
+  maxMaxAngVel: 140
+  secondsToMax: 6
+  baseTorque: 55
+  maxTorque: 700
+  brakeStrength: 8
+  stopThreshold: 0.15
   inputDeadzone: 0.05
-  rampDownPerSec: 0.6
-  resetRampInstantlyOnRelease: 0
+  angularDragWhenIdle: 3
+  angularDragWhenDriving: 0.2
+  resetRampOnDirectionChange: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
