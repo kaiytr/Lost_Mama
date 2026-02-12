@@ -17,7 +17,7 @@ public class AutoBouncePad2D : MonoBehaviour
     [SerializeField] private float minApproachSpeed = 0.1f;    // 내려오면서 밟을 때만 발동(0이면 항상 발동)
     [SerializeField] private bool removeAxisVelocityBeforeLaunch = true; // 발사 방향 성분 속도 제거(옆속도는 유지)
 
-    private readonly Dictionary<Rigidbody2D, float> lastLaunchTime = new();
+    private readonly Dictionary<Rigidbody2D, float > lastLaunchTime = new();
 
     private Vector2 Dir => (launchDirection ? (Vector2)launchDirection.up : (Vector2)transform.up).normalized;
 
@@ -68,6 +68,7 @@ public class AutoBouncePad2D : MonoBehaviour
         {
             float along = Vector2.Dot(rb.linearVelocity, dir);
             rb.linearVelocity -= dir * along;
+            // Debug.Log("[AutoBouncePad2D] Removed launch-axis velocity: " + along);
         }
 
         // ✅ mass=0.0001이어도 안정적인 방식: "속도"를 직접 부여
