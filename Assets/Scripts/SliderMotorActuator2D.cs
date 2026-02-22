@@ -1,8 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SliderJoint2D))]
-public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputReceiver
+public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputReceiver, IPossessionCallbacks
 {
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SliderJoint2D joint;
@@ -17,12 +17,27 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
     [SerializeField] private float stopThreshold = 0.05f;
     [SerializeField] private float inputDeadzone = 0.05f;
 
+    [Header("Linear damping (feel)")]
+    [SerializeField] private float linearDampingWhenDriving = 0.1f;
+    [SerializeField] private float linearDampingWhenIdle = 2.0f;
+
+    [Header("Input freshness (possession switching)")]
+    [Tooltip("ë¹™ì˜ ì „í™˜ ë“±ìœ¼ë¡œ ì…ë ¥ì´ ëŠê¸´ ë’¤, ì´ ì‹œê°„ ë™ì•ˆ SetInput/SetChargingì´ ì•ˆ ì˜¤ë©´ 'ìŠ¤í…Œì¼'ë¡œ íŒë‹¨í•©ë‹ˆë‹¤.")]
+    [SerializeField] private float inputStaleSeconds = 0.06f;
+
+    [Tooltip("ìŠ¤í…Œì¼ì¼ ë•Œ ëª¨í„°ë¥¼ ì¼  ì±„ speed=0ìœ¼ë¡œ 'ë¶™ì¡ê¸°(ë¸Œë ˆì´í¬)'í•©ë‹ˆë‹¤. ë¯¸ë„ëŸ¬ì§ê¹Œì§€ ê±°ì˜ ì‚¬ë¼ì§‘ë‹ˆë‹¤.")]
+    [SerializeField] private bool holdWhenStale = true;
+
+    [Tooltip("ìŠ¤í…Œì¼ì¼ ë•Œ(í˜¹ì€ Unpossessedì¼ ë•Œ) ì ìš©í•  ì„ í˜• ê°ì‡ (ë“œë˜ê·¸).")]
+    [SerializeField] private float linearDampingWhenStale = 6.0f;
+
     [Header("Charge / Release (optional)")]
     [SerializeField] private bool enableCharge = true;
     [SerializeField] private float maxChargeSeconds = 2.0f;
     [SerializeField] private float releaseSpeedMultiplier = 1.8f;
     [SerializeField] private float releaseGuardSeconds = 0.12f;
 
+    // ===== runtime state =====
     private float inputX;
     private float rampTime;
     private float lastDir;
@@ -34,25 +49,44 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
 
     private float releaseGuardTimer;
 
+    // ì…ë ¥ ëŠê¹€ ê°ì§€ìš©(íšŒì „ ìŠ¤í¬ë¦½íŠ¸ ë°©ì‹)
+    private float lastInputTime = -999f;
+
     private void Awake()
     {
         if (!rb) rb = GetComponent<Rigidbody2D>();
         if (!joint) joint = GetComponent<SliderJoint2D>();
 
-        // ±âº»ÀûÀ¸·Î joint motor¸¦ ½ºÅ©¸³Æ®°¡ Á¦¾îÇÑ´Ù°í °¡Á¤
+        // ìŠ¤í¬ë¦½íŠ¸ê°€ motorë¥¼ ì œì–´í•œë‹¤ê³  ê°€ì •
         joint.useMotor = true;
     }
 
-    // PossessionHub(PossessableObject)¿¡¼­ È£ÃâµÊ
+    // PossessableObjectì—ì„œ í˜¸ì¶œë¨
     public void SetInput(float x)
     {
         inputX = Mathf.Clamp(-x, -1f, 1f);
+        lastInputTime = Time.time;
     }
 
-    // ½ºÆäÀÌ½º È¦µå/¸±¸®Áî Àü´Ş¹ŞÀ½
+    // Space ì°¨ì§€ ì…ë ¥
     public void SetCharging(bool charging)
     {
         isCharging = charging;
+        lastInputTime = Time.time; // ì°¨ì§€ ì‹ í˜¸ë„ ì…ë ¥ ê°±ì‹ ìœ¼ë¡œ ì·¨ê¸‰(íšŒì „ ìŠ¤í¬ë¦½íŠ¸ì™€ ë™ì¼)
+    }
+
+    // ===== IPossessionCallbacks =====
+    public void OnPossessed()
+    {
+        // ë‹¤ì‹œ ë¹™ì˜ë˜ë©´ ì •ìƒ ë™ì‘
+        lastInputTime = Time.time;
+        joint.useMotor = true;
+    }
+
+    public void OnUnpossessed()
+    {
+        // âœ… ê°€ì¥ í™•ì‹¤í•œ ì¦‰ì‹œ ì°¨ë‹¨(0.06ì´ˆ ê¸°ë‹¤ë¦¬ëŠ” ê²ƒì¡°ì°¨ ì‹«ìœ¼ë©´ ì—¬ê¸°ì„œ ë°”ë¡œ ëŠì–´ë²„ë¦¬ê¸°)
+        ForceStaleStop();
     }
 
     private void FixedUpdate()
@@ -60,7 +94,42 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
         float dt = Time.fixedDeltaTime;
         if (releaseGuardTimer > 0f) releaseGuardTimer -= dt;
 
-        // ¸±¸®Áî °¨Áö(Â÷Áö -> ÇØÁ¦ ¼ø°£)
+        bool inputFresh = (Time.time - lastInputTime) <= inputStaleSeconds;
+
+        // ===== ì…ë ¥ì´ ëŠê²¼ë‹¤ë©´(ë¹™ì˜ ì „í™˜) =====
+        if (!inputFresh)
+        {
+            // íšŒì „ ìŠ¤í¬ë¦½íŠ¸ì²˜ëŸ¼ "ë” ì´ìƒ í˜ì„ ì•ˆ ì£¼ëŠ” ìƒíƒœ"ë¡œ ì •ë¦¬
+            rampTime = 0f;
+            chargeTime = 0f;
+            chargeDir = 0f;
+            lastDir = 0f;
+            prevCharging = false;
+            releaseGuardTimer = 0f;
+
+            rb.linearDamping = linearDampingWhenStale;
+
+            // âœ… í•µì‹¬: motorSpeedë¥¼ 0ìœ¼ë¡œ "ë°˜ë“œì‹œ" ë‚´ë ¤ì•¼, useMotorê°€ ì¼œì ¸ìˆë“ /ë‹¤ë¥¸ ê³³ì—ì„œ ì¼œë²„ë¦¬ë“  ê³„ì† ì•ˆ ë¯¼ë‹¤.
+            ApplyMotor(0f);
+
+            if (holdWhenStale)
+            {
+                // ëª¨í„°ë¥¼ ì¼  ì±„ speed=0 â†’ ë¶™ì¡ê¸°/ë¸Œë ˆì´í¬(ë¯¸ë„ëŸ¬ì§ê¹Œì§€ ê±°ì˜ ì œê±°)
+                joint.useMotor = true;
+            }
+            else
+            {
+                // ëª¨í„° ì™„ì „ OFF â†’ ê´€ì„±ëŒ€ë¡œ ì½”ìŠ¤íŠ¸
+                joint.useMotor = false;
+            }
+
+            return;
+        }
+
+        // ===== ì—¬ê¸°ë¶€í„°ëŠ” ì •ìƒ(ë¹™ì˜ ì¤‘ ì…ë ¥ ë“¤ì–´ì˜¤ëŠ” ì¤‘) =====
+        joint.useMotor = true;
+
+        // ë¦´ë¦¬ì¦ˆ ê°ì§€(ì°¨ì§€ -> í•´ì œ)
         if (enableCharge && prevCharging && !isCharging)
         {
             if (chargeTime > 0f && Mathf.Abs(chargeDir) > 0f)
@@ -71,7 +140,7 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
                 ApplyMotor(chargeDir * relSpeed);
                 releaseGuardTimer = releaseGuardSeconds;
 
-                // Æò»ó½Ã ·¥ÇÁ¿Í µ¿±âÈ­(¿øÇÏ¸é À¯Áö)
+                // í‰ìƒì‹œ ë¨í”„ì™€ ë™ê¸°í™”
                 rampTime = chargeTime;
                 lastDir = chargeDir;
 
@@ -82,14 +151,15 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
 
         prevCharging = isCharging;
 
-        // Â÷Áö Áß: ÀÔ·Â ¹æÇâ¸¸ ±â¾ïÇÏ°í ½Ã°£ ´©Àû, ½ÇÁ¦ ±¸µ¿Àº ¸ØÃã(¶Ç´Â ¾ÆÁÖ ¾àÇÏ°Ô)
+        // ì°¨ì§€ ì¤‘: ëˆ„ì ë§Œ, ì‹¤ì œ êµ¬ë™ì€ ë©ˆì¶¤
         if (enableCharge && isCharging)
         {
+            rb.linearDamping = linearDampingWhenIdle;
+
             float dir = Mathf.Abs(inputX) > inputDeadzone ? Mathf.Sign(inputX) : 0f;
 
             if (dir != 0f)
             {
-                // ¹æÇâ ¹Ù²î¸é Â÷Áö ¸®¼Â(¿øÇÏ¸é ¿É¼ÇÈ­ °¡´É)
                 if (chargeDir != 0f && dir != chargeDir)
                     chargeTime = 0f;
 
@@ -97,18 +167,19 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
                 chargeTime = Mathf.Min(maxChargeSeconds, chargeTime + dt);
             }
 
-            rampTime = 0f; // Â÷Áö Áß¿¡´Â Æò»ó½Ã °¡¼Ó ´©Àû ²ô±â
-            ApplyMotor(0f); // Â÷Áö Áß¿¡´Â Á¤Áö(µµ¸£·¹ ¡°´ç±â´Â Áß¡± ´À³¦)
+            rampTime = 0f;
+            ApplyMotor(0f);
             return;
         }
 
         bool driving = Mathf.Abs(inputX) > inputDeadzone;
 
+        rb.linearDamping = driving ? linearDampingWhenDriving : linearDampingWhenIdle;
+
         if (driving)
         {
             float dir = Mathf.Sign(inputX);
 
-            // ¹æÇâ ¹Ù²î¸é ·¥ÇÁ ¸®¼Â
             if (lastDir != 0f && dir != lastDir)
                 rampTime = 0f;
 
@@ -120,9 +191,6 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
 
             float speed = Mathf.Lerp(baseSpeed, maxSpeed, rFine);
             ApplyMotor(dir * speed);
-
-            // ¸±¸®Áî Á÷ÈÄ Àá±ñÀº ½ºÅ©¸³Æ®°¡ ¡°ºê·¹ÀÌÅ©/Å¬·¥ÇÁ¡± °Çµå¸®Áö ¾Ê°Ô
-            // (SliderJoint2D limits°¡ ¾Ë¾Æ¼­ ¸·¾ÆÁÜ)
         }
         else
         {
@@ -131,7 +199,7 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
 
             if (releaseGuardTimer <= 0f)
             {
-                // joint Ãà ¹æÇâ ¼Óµµ¸¸ ºÎµå·´°Ô 0À¸·Î
+                // joint ì¶• ë°©í–¥ ì†ë„ë§Œ ë¶€ë“œëŸ½ê²Œ 0ìœ¼ë¡œ(ë¸Œë ˆì´í¬)
                 float v = GetAxisVelocity();
                 float t = 1f - Mathf.Exp(-brakeStrength * dt);
                 float v2 = Mathf.Lerp(v, 0f, t);
@@ -142,18 +210,49 @@ public class SliderMotorActuator2D : MonoBehaviour, IActuator, IChargeInputRecei
         }
     }
 
+    private void ForceStaleStop()
+    {
+        // ì¦‰ì‹œ stale ìƒíƒœë¡œ ë§Œë“¤ì–´ì„œ FixedUpdateì—ì„œ ë°”ë¡œ stale ì²˜ë¦¬ë˜ê²Œ í•¨
+        lastInputTime = -999f;
+
+        // ì¦‰ì‹œ "ê³„ì† ë¯¸ëŠ”" í˜„ìƒ ì°¨ë‹¨
+        inputX = 0f;
+        isCharging = false;
+        prevCharging = false;
+
+        rampTime = 0f;
+        lastDir = 0f;
+
+        chargeTime = 0f;
+        chargeDir = 0f;
+
+        releaseGuardTimer = 0f;
+
+        rb.linearDamping = linearDampingWhenStale;
+
+        // âœ… ì¦‰ì‹œ motorSpeed=0 (ì œì¼ ì¤‘ìš”)
+        ApplyMotor(0f);
+
+        if (holdWhenStale)
+        {
+            joint.useMotor = true;   // speed=0ìœ¼ë¡œ ë¶™ì¡ê¸°
+        }
+        else
+        {
+            joint.useMotor = false;  // ëª¨í„° OFF ì½”ìŠ¤íŠ¸
+        }
+    }
+
     private void ApplyMotor(float motorSpeed)
     {
-        // SliderJoint2D ¸ğÅÍ´Â "Motor Speed"·Î Ãà ¹æÇâ ¼Óµµ¸¦ ¸¸µç´Ù
         JointMotor2D m = joint.motor;
         m.motorSpeed = motorSpeed;
         joint.motor = m;
     }
 
-    // jointÀÇ ÀÌµ¿Ãà ¹æÇâ ¼Óµµ¸¦ ÃßÁ¤(Ãà ±âÁØÀº joint.angle)
+    // joint.angle ê¸°ë°˜ ì¶• ë°©í–¥ ì†ë„
     private float GetAxisVelocity()
     {
-        // joint.angle 0=¿À¸¥ÂÊ(¿ùµå x), 90=À§ÂÊ(¿ùµå y)
         float ang = joint.angle * Mathf.Deg2Rad;
         Vector2 axis = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)).normalized;
         return Vector2.Dot(rb.linearVelocity, axis);
