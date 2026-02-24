@@ -331,6 +331,7 @@ GameObject:
   - component: {fileID: 9106127011220349886}
   - component: {fileID: 6716387640761069939}
   - component: {fileID: 7497244080293215336}
+  - component: {fileID: 491604069437874800}
   m_Layer: 6
   m_Name: BounceObject
   m_TagString: Untagged
@@ -402,3 +403,15 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &491604069437874800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3934884484120484486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6ed17365564b4e48a438d799c3a0e60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MirrorPosition
