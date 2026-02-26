@@ -204,7 +204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AutoBouncePad2D
   targetMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 9
   launchDirection: {fileID: 0}
   launchSpeed: 12
   perTargetCooldown: 0.15

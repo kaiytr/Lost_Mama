@@ -204,7 +204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FanPushZone2D
   targetMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 9
   pushDirection: {fileID: 3672744279226827546}
   acceleration: 20
   maxSpeedAlongDir: 1
