@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4972278737673885124}
   - component: {fileID: 4377074729129586481}
   - component: {fileID: 5511933693377120131}
+  - component: {fileID: 6696177456613892281}
   m_Layer: 6
   m_Name: PivotRoot
   m_TagString: Untagged
@@ -82,6 +83,18 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &6696177456613892281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3273914837749055022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6ed17365564b4e48a438d799c3a0e60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MirrorPosition
 --- !u!1 &6107750684008733037
 GameObject:
   m_ObjectHideFlags: 0
