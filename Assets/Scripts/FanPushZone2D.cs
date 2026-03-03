@@ -1,120 +1,187 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider2D))]
 public class FanPushZone2D : MonoBehaviour
 {
-    [Header("Who can be pushed")]
-    [SerializeField] private LayerMask targetMask;
+    [Header("Zone (Wind Trigger Collider)")]
+    [SerializeField] private Collider2D zoneCollider;   // ✅ 바람 범위 트리거 콜라이더
+    [SerializeField] private Transform windOrigin;      // 비우면 transform.position
 
-    [Header("Push direction (if null, uses transform.up)")]
-    [SerializeField] private Transform pushDirection;
+    [Header("Push target (who gets pushed)")]
+    [SerializeField] private LayerMask targetMask;      // ✅ Player만
 
-    [Header("Push feel (mass-independent)")]
-    [SerializeField] private float acceleration = 8f; // m/s^2 : 매초 이만큼 속도가 증가(천천히 밀림)
-    [SerializeField] private float maxSpeedAlongDir = 6f; // dir 방향 최대 속도(캡)
+    [Header("Push direction")]
+    [SerializeField] private Transform pushDirection;   // 비우면 transform.up
 
-    [Header("Optional")]
-    [SerializeField] private bool cancelOppositeVelocity = true; // dir 반대 성분(역풍) 제거
-    [SerializeField] private float radiusForFalloff = 0f; // 0이면 감쇠 없음. >0이면 중심에서 멀수록 약해짐
+    [Header("Push feel")]
+    [SerializeField] private float acceleration = 8f;
+    [SerializeField] private float maxSpeedAlongDir = 6f;
+    [SerializeField] private bool cancelOppositeVelocity = true;
 
-    // ✅ 콜라이더가 여러 개여도 안전하게: rb별로 "존 내부 콜라이더 개수"를 카운트
-    private readonly Dictionary<Rigidbody2D, int> insideCount = new();
+    [Header("Occlusion (block wind)")]
+    [SerializeField] private bool blockByObjects = true;
+
+    [Tooltip("Layers that CAN block wind. Usually Everything.")]
+    [SerializeField] private LayerMask blockerMask = ~0; // ✅ Everything 추천
+
+    [Tooltip("Layers that should NOT block wind. (e.g. Player)")]
+    [SerializeField] private LayerMask blockIgnoreMask;  // ✅ Player 넣기
+
+    [Tooltip("If ON, only hits whose hit point is inside zone will block.")]
+    [SerializeField] private bool onlyBlockInsideZone = true;
+
+    [Tooltip("Ignore trigger colliders as blockers (recommended).")]
+    [SerializeField] private bool ignoreTriggerBlockers = true;
+
+    [Header("Debug")]
+    [SerializeField] private bool debugDraw = false;
+
+    private readonly HashSet<Rigidbody2D> inside = new();
+
+    // 스캔 버퍼(NonAlloc)
+    private readonly Collider2D[] overlapBuffer = new Collider2D[64];
+
+    // ✅ readonly 제거 (여기만 바뀜)
+    private ContactFilter2D targetFilter;
+
+    private static readonly RaycastHit2D[] rayHits = new RaycastHit2D[32];
 
     private Vector2 Dir => (pushDirection ? (Vector2)pushDirection.up : (Vector2)transform.up).normalized;
+    private Vector2 Origin => windOrigin ? (Vector2)windOrigin.position : (Vector2)transform.position;
 
-    private void Reset()
+    private void Awake()
     {
-        // 기본적으로 이 스크립트는 Trigger Zone 용도
-        var col = GetComponent<Collider2D>();
-        col.isTrigger = true;
+        if (!zoneCollider)
+        {
+            // 트리거 우선 탐색
+            var cols = GetComponents<Collider2D>();
+            foreach (var c in cols)
+            {
+                if (c && c.isTrigger) { zoneCollider = c; break; }
+            }
+            if (!zoneCollider && cols.Length > 0) zoneCollider = cols[0];
+        }
+
+        // ✅ 필터 초기화(여기서 설정)
+        targetFilter = new ContactFilter2D
+        {
+            useLayerMask = true,
+            layerMask = targetMask,
+            useTriggers = true
+        };
     }
 
-    private bool IsTarget(Collider2D col)
-        => ((1 << col.gameObject.layer) & targetMask) != 0;
-
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnEnable()
     {
-        if (!IsTarget(other)) return;
-        var rb = other.attachedRigidbody;
-        if (rb == null) return;
-
-        insideCount.TryGetValue(rb, out int c);
-        insideCount[rb] = c + 1;
+        inside.Clear();
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    private void OnDisable()
     {
-        var rb = other.attachedRigidbody;
-        if (rb == null) return;
-
-        if (!insideCount.TryGetValue(rb, out int c)) return;
-
-        c -= 1;
-        if (c <= 0) insideCount.Remove(rb);
-        else insideCount[rb] = c;
+        inside.Clear();
     }
 
     private void FixedUpdate()
     {
-        if (insideCount.Count == 0) return;
+        if (!zoneCollider) return;
+
+        // ✅ 매 FixedUpdate마다 현재 존 안 타겟 재구성(존 밖이면 즉시 빠짐)
+        RebuildInsideSet();
+
+        if (inside.Count == 0) return;
 
         Vector2 dir = Dir;
+        Vector2 origin = Origin;
         float dt = Time.fixedDeltaTime;
 
-        // foreach 도중 Remove가 일어날 수 있으니 null 정리용 리스트
-        List<Rigidbody2D> toRemove = null;
-
-        foreach (var kv in insideCount)
+        foreach (var rb in inside)
         {
-            var rb = kv.Key;
-            if (rb == null)
-            {
-                (toRemove ??= new List<Rigidbody2D>()).Add(rb);
-                continue;
-            }
+            if (!rb) continue;
 
-            // 거리 감쇠(선택)
-            float falloff = 1f;
-            if (radiusForFalloff > 0f)
-            {
-                float dist = Vector2.Distance(rb.worldCenterOfMass, (Vector2)transform.position);
-                falloff = Mathf.Clamp01(1f - (dist / radiusForFalloff));
-                if (falloff <= 0f) continue;
-            }
+            if (blockByObjects && IsBlocked(origin, rb))
+                continue;
 
             Vector2 v = rb.linearVelocity;
-
             float along = Vector2.Dot(v, dir);
 
-            // 역풍 성분 제거(선택)
             if (cancelOppositeVelocity && along < 0f)
             {
-                v -= dir * along; // along이 음수라서 빼면 반대 성분이 사라짐
+                v -= dir * along;
                 along = 0f;
             }
 
-            // "천천히 밀기": dir 방향 속도를 acceleration * dt 만큼 증가시키되, 최대치로 캡
-            float newAlong = Mathf.Min(along + acceleration * falloff * dt, maxSpeedAlongDir);
-
-            // dir축 성분만 원하는 값으로 맞추기(옆속도는 유지)
+            float newAlong = Mathf.Min(along + acceleration * dt, maxSpeedAlongDir);
             v += dir * (newAlong - along);
 
             rb.linearVelocity = v;
             rb.WakeUp();
+
+            if (debugDraw)
+                Debug.DrawLine(origin, rb.worldCenterOfMass, Color.white, 0.02f);
+        }
+    }
+
+    private void RebuildInsideSet()
+    {
+        inside.Clear();
+
+        // targetMask가 런타임에 바뀔 수 있으면 아래 한 줄로 갱신해도 됨
+        // targetFilter.layerMask = targetMask;
+
+        int n = zoneCollider.Overlap(targetFilter, overlapBuffer);
+        for (int i = 0; i < n; i++)
+        {
+            var col = overlapBuffer[i];
+            if (!col) continue;
+
+            var rb = col.attachedRigidbody;
+            if (!rb) continue;
+
+            // 콜라이더/리지드바디 레이어 꼬임 방지
+            int colLayer = col.gameObject.layer;
+            int rbLayer = rb.gameObject.layer;
+            if (!IsInMask(colLayer, targetMask) && !IsInMask(rbLayer, targetMask))
+                continue;
+
+            inside.Add(rb);
+        }
+    }
+
+    private bool IsBlocked(Vector2 origin, Rigidbody2D targetRb)
+    {
+        Vector2 targetPoint = targetRb.worldCenterOfMass;
+        Vector2 to = targetPoint - origin;
+        float dist = to.magnitude;
+        if (dist < 0.001f) return false;
+
+        Vector2 d = to / dist;
+
+        int count = Physics2D.RaycastNonAlloc(origin, d, rayHits, dist, blockerMask.value);
+        for (int i = 0; i < count; i++)
+        {
+            var h = rayHits[i];
+            var col = h.collider;
+            if (!col) continue;
+
+            if (ignoreTriggerBlockers && col.isTrigger) continue;                 // 트리거 제외
+            if (IsInMask(col.gameObject.layer, blockIgnoreMask)) continue;       // Player 등 제외
+            if (col.transform.IsChildOf(transform)) continue;                    // 팬 자기 자신 제외
+            if (h.rigidbody == targetRb) continue;                               // 목표 자신 제외
+
+            if (onlyBlockInsideZone && !zoneCollider.OverlapPoint(h.point))      // 바람 존 안에서만 차단
+                continue;
+
+            if (debugDraw)
+                Debug.DrawLine(origin, h.point, Color.red, 0.05f);
+
+            return true;
         }
 
-        if (toRemove != null)
-        {
-            foreach (var rb in toRemove) insideCount.Remove(rb);
-        }
+        return false;
     }
-#if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
+
+    private static bool IsInMask(int layer, LayerMask mask)
     {
-        Vector2 dir = (pushDirection ? (Vector2)pushDirection.up : (Vector2)transform.up).normalized;
-        Vector3 p = transform.position;
-        UnityEngine.Gizmos.DrawLine(p, p + (Vector3)dir * 2f);
+        return (mask.value & (1 << layer)) != 0;
     }
-#endif
 }
