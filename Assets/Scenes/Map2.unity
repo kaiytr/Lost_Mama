@@ -251,6 +251,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21991f00e09cb5847999ee79a7615898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessableObject
+  allowSelectFromChildren: 1
+  allowSelectFromTriggerColliders: 1
+  useExplicitSelectionColliders: 0
+  selectionColliders: []
 --- !u!4 &616893660
 Transform:
   m_ObjectHideFlags: 0
@@ -440,7 +444,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8585099271ad2b64797d48614bd263eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteTintOnPossession
-  renderers: []
+  useManualRenderers: 0
+  renderers:
+  - {fileID: 806284528}
+  tintChildren: 1
+  includeInactiveChildren: 1
   possessedTint: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   chargingTint: {r: 1, g: 0.6, b: 0.1, a: 1}
 --- !u!114 &806284523
@@ -1185,7 +1193,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8585099271ad2b64797d48614bd263eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteTintOnPossession
-  renderers: []
+  useManualRenderers: 0
+  renderers:
+  - {fileID: 1172776696}
+  tintChildren: 1
+  includeInactiveChildren: 1
   possessedTint: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   chargingTint: {r: 1, g: 0.6, b: 0.1, a: 1}
 --- !u!114 &1172776691
@@ -1708,6 +1720,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21991f00e09cb5847999ee79a7615898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessableObject
+  allowSelectFromChildren: 1
+  allowSelectFromTriggerColliders: 1
+  useExplicitSelectionColliders: 0
+  selectionColliders: []
 --- !u!4 &1473680986
 Transform:
   m_ObjectHideFlags: 0
@@ -1816,7 +1832,7 @@ Transform:
   m_GameObject: {fileID: 1637785879}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.324924, y: 0, z: 0}
+  m_LocalPosition: {x: -5.850851, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1890,7 +1906,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 11.739047, y: 1}
+  m_Size: {x: 10.687193, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1909,11 +1925,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2594064779695534874, guid: ed92dcf7b38d67e4d8c156e9a5961349, type: 3}
       propertyPath: m_ConnectedAnchor.x
-      value: 0.008493662
+      value: 0.31
       objectReference: {fileID: 0}
     - target: {fileID: 2594064779695534874, guid: ed92dcf7b38d67e4d8c156e9a5961349, type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: 5.770668
+      value: 8.82
       objectReference: {fileID: 0}
     - target: {fileID: 3731836638518534414, guid: ed92dcf7b38d67e4d8c156e9a5961349, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1995,7 +2011,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8585099271ad2b64797d48614bd263eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteTintOnPossession
-  renderers: []
+  useManualRenderers: 0
+  renderers:
+  - {fileID: 1775877493}
+  tintChildren: 0
+  includeInactiveChildren: 1
   possessedTint: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   chargingTint: {r: 1, g: 0.6, b: 0.1, a: 1}
 --- !u!114 &1775877488
@@ -2025,6 +2045,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21991f00e09cb5847999ee79a7615898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessableObject
+  allowSelectFromChildren: 0
+  allowSelectFromTriggerColliders: 0
+  useExplicitSelectionColliders: 1
+  selectionColliders:
+  - {fileID: 1775877491}
 --- !u!114 &1775877490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2090,7 +2115,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.49999997, y: 0}
+  m_Offset: {x: 0.025927246, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2100,7 +2125,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.0001, y: 1}
+  m_Size: {x: 1.0519544, y: 1}
   m_EdgeRadius: 0
 --- !u!61 &1775877492
 BoxCollider2D:
@@ -2136,7 +2161,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -5.324924, y: 0}
+  m_Offset: {x: -5.850851, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2146,7 +2171,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 11.739047, y: 1}
+  m_Size: {x: 10.687193, y: 1}
   m_EdgeRadius: 0
 --- !u!212 &1775877493
 SpriteRenderer:

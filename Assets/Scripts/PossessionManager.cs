@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PossessionManager : MonoBehaviour
@@ -19,31 +20,40 @@ public class PossessionManager : MonoBehaviour
         var mouse = Mouse.current;
         if (kb == null || mouse == null) return;
 
-        // 클릭으로 대상 선택
         if (mouse.leftButton.wasPressedThisFrame)
         {
             Vector2 screenPos = mouse.position.ReadValue();
             Ray ray = cam.ScreenPointToRay(screenPos);
-            RaycastHit2D hit = Physics2D.GetRayIntersection(ray, 200f, possessMask);
 
-            if (hit.collider != null)
+            // ✅ 전부 맞춰놓고 조건에 맞는 첫 대상 선택
+            var hits = Physics2D.GetRayIntersectionAll(ray, 200f, possessMask);
+            if (hits != null && hits.Length > 0)
             {
-                var p = hit.collider.GetComponentInParent<PossessableObject>();
-                if (p != null && p != current)
+                Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+                for (int i = 0; i < hits.Length; i++)
                 {
-                    if (current != null) current.SetPossessed(false);
-                    current = p;
-                    current.SetPossessed(true);
+                    var col = hits[i].collider;
+                    if (col == null) continue;
+
+                    var p = ResolvePossessTarget(col);
+                    if (p == null) continue;
+
+                    if (p != current)
+                    {
+                        if (current != null) current.SetPossessed(false);
+                        current = p;
+                        current.SetPossessed(true);
+                    }
+                    break;
                 }
             }
         }
 
-        // A/D 입력
         float x = 0f;
         if (kb.aKey.isPressed) x -= 1f;
         if (kb.dKey.isPressed) x += 1f;
 
-        // Space 차지 입력
         bool charging = kb.spaceKey.isPressed;
 
         if (current != null)
@@ -51,5 +61,21 @@ public class PossessionManager : MonoBehaviour
             current.Handle(x);
             current.HandleCharging(charging);
         }
+    }
+
+    private PossessableObject ResolvePossessTarget(Collider2D clickedCol)
+    {
+        if (clickedCol == null) return null;
+
+        // 1) 같은 오브젝트에 PossessableObject가 있으면 그걸 우선
+        var direct = clickedCol.GetComponent<PossessableObject>();
+        if (direct != null)
+            return direct.IsColliderSelectable(clickedCol) ? direct : null;
+
+        // 2) 부모에서 PossessableObject 찾기
+        var parent = clickedCol.GetComponentInParent<PossessableObject>();
+        if (parent == null) return null;
+
+        return parent.IsColliderSelectable(clickedCol) ? parent : null;
     }
 }
