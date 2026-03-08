@@ -14744,6 +14744,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1583631806}
   - component: {fileID: 1583631805}
+  - component: {fileID: 1583631807}
   m_Layer: 0
   m_Name: Endline
   m_TagString: Untagged
@@ -14781,7 +14782,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -14812,6 +14813,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1583631807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1583631804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cc801179a98ea64e92994e4c1981cb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneTrigger
+  targetSceneName: End
 --- !u!1 &1590609509
 GameObject:
   m_ObjectHideFlags: 0
@@ -16759,6 +16773,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 517996398311323379, guid: 68972cf31fa315e4dbbb2fd924feee3d, type: 3}
       propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 517996398311323379, guid: 68972cf31fa315e4dbbb2fd924feee3d, type: 3}
+      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 2322177705290191371, guid: 68972cf31fa315e4dbbb2fd924feee3d, type: 3}
