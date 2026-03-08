@@ -21,4 +21,13 @@ public class SceneChanger : MonoBehaviour
         int next = SceneManager.GetActiveScene().buildIndex + 1;
         SceneManager.LoadScene(next);
     }
+
+    public void ExitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
 }
