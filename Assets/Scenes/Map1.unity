@@ -1545,7 +1545,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8585099271ad2b64797d48614bd263eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteTintOnPossession
-  renderers: []
+  useManualRenderers: 0
+  renderers:
+  - {fileID: 623266570}
+  - {fileID: 87643091}
+  tintChildren: 1
+  includeInactiveChildren: 1
   possessedTint: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   chargingTint: {r: 1, g: 0.6, b: 0.1, a: 1}
 --- !u!114 &623266565
@@ -1575,6 +1580,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21991f00e09cb5847999ee79a7615898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessableObject
+  allowSelectFromChildren: 1
+  allowSelectFromTriggerColliders: 1
+  useExplicitSelectionColliders: 0
+  selectionColliders: []
 --- !u!114 &623266567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1943,7 +1952,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8585099271ad2b64797d48614bd263eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteTintOnPossession
-  renderers: []
+  useManualRenderers: 0
+  renderers:
+  - {fileID: 798962376}
+  tintChildren: 0
+  includeInactiveChildren: 0
   possessedTint: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   chargingTint: {r: 1, g: 0.6, b: 0.1, a: 1}
 --- !u!114 &798962371
@@ -1973,6 +1986,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21991f00e09cb5847999ee79a7615898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessableObject
+  allowSelectFromChildren: 0
+  allowSelectFromTriggerColliders: 0
+  useExplicitSelectionColliders: 1
+  selectionColliders: []
 --- !u!114 &798962373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2038,7 +2055,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.49999997, y: 0}
+  m_Offset: {x: 0.011695445, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2048,7 +2065,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.0001, y: 1}
+  m_Size: {x: 1.0234908, y: 1}
   m_EdgeRadius: 0
 --- !u!61 &798962375
 BoxCollider2D:
@@ -2084,7 +2101,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -5.324924, y: 0}
+  m_Offset: {x: -5.865865, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2094,7 +2111,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 11.739047, y: 1}
+  m_Size: {x: 10.657165, y: 1}
   m_EdgeRadius: 0
 --- !u!212 &798962376
 SpriteRenderer:
@@ -2295,7 +2312,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8585099271ad2b64797d48614bd263eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteTintOnPossession
-  renderers: []
+  useManualRenderers: 0
+  renderers:
+  - {fileID: 841171943}
+  - {fileID: 1358695908}
+  tintChildren: 1
+  includeInactiveChildren: 1
   possessedTint: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   chargingTint: {r: 1, g: 0.6, b: 0.1, a: 1}
 --- !u!114 &841171938
@@ -2325,6 +2347,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21991f00e09cb5847999ee79a7615898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessableObject
+  allowSelectFromChildren: 1
+  allowSelectFromTriggerColliders: 1
+  useExplicitSelectionColliders: 0
+  selectionColliders: []
 --- !u!114 &841171940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2590,7 +2616,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8585099271ad2b64797d48614bd263eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteTintOnPossession
-  renderers: []
+  useManualRenderers: 0
+  renderers:
+  - {fileID: 902961139}
+  - {fileID: 284394051}
+  tintChildren: 1
+  includeInactiveChildren: 1
   possessedTint: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   chargingTint: {r: 1, g: 0.6, b: 0.1, a: 1}
 --- !u!114 &902961134
@@ -2620,6 +2651,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21991f00e09cb5847999ee79a7615898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessableObject
+  allowSelectFromChildren: 1
+  allowSelectFromTriggerColliders: 1
+  useExplicitSelectionColliders: 0
+  selectionColliders: []
 --- !u!114 &902961136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2907,7 +2942,7 @@ Transform:
   m_GameObject: {fileID: 956595124}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.21410275, y: 43.820007, z: -10}
+  m_LocalPosition: {x: -0.21410275, y: 38.13, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3060,7 +3095,7 @@ Transform:
   m_GameObject: {fileID: 961369743}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.13, y: 43.82, z: -10}
+  m_LocalPosition: {x: -8.7, y: 38.13, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4123,7 +4158,7 @@ Transform:
   m_GameObject: {fileID: 1590609509}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.324924, y: 0, z: 0}
+  m_LocalPosition: {x: -5.865865, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -4197,7 +4232,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 11.739047, y: 1}
+  m_Size: {x: 10.657165, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -4416,7 +4451,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8585099271ad2b64797d48614bd263eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteTintOnPossession
-  renderers: []
+  useManualRenderers: 0
+  renderers:
+  - {fileID: 1701708079}
+  - {fileID: 176794530}
+  tintChildren: 1
+  includeInactiveChildren: 1
   possessedTint: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   chargingTint: {r: 1, g: 0.6, b: 0.1, a: 1}
 --- !u!114 &1701708074
@@ -4446,6 +4486,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21991f00e09cb5847999ee79a7615898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PossessableObject
+  allowSelectFromChildren: 1
+  allowSelectFromTriggerColliders: 1
+  useExplicitSelectionColliders: 0
+  selectionColliders: []
 --- !u!114 &1701708076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4797,11 +4841,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 446710838889869722, guid: 68972cf31fa315e4dbbb2fd924feee3d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7.13
+      value: -8.7
       objectReference: {fileID: 0}
     - target: {fileID: 446710838889869722, guid: 68972cf31fa315e4dbbb2fd924feee3d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 43.82
+      value: 38.13
       objectReference: {fileID: 0}
     - target: {fileID: 446710838889869722, guid: 68972cf31fa315e4dbbb2fd924feee3d, type: 3}
       propertyPath: m_LocalPosition.z
